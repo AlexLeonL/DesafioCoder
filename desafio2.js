@@ -12,7 +12,6 @@ class ProductManager {
       const data = await fs.readFile(this.path, 'utf-8');
       this.products = JSON.parse(data);
     } catch (error) {
-      // Si hay un error al leer el archivo, se asume que aún no hay productos.
       this.products = [];
     }
   }
@@ -26,13 +25,19 @@ class ProductManager {
   }
 
   addProduct(product) {
+    const requiredFields = ['title', 'description', 'price', 'thumbnail', 'code', 'stock'];
+  
+    if (!Object.keys(product).every(field => requiredFields.includes(field) && product[field])) {
+      throw new Error('Ingrese todos los campos obligatorios');
+    }
+  
     const id = this.products.length + 1;
     product.id = id;
-
+  
     if (this.products.some(p => p.code === product.code)) {
       throw new Error('El código del producto ya existe');
     }
-
+  
     this.products.push(product);
     this.saveProducts();
     return product;
@@ -105,3 +110,4 @@ console.log(updatedProduct);
 const productIdToDelete = 1; 
 const deletedProduct = productManager.deleteProduct(productIdToDelete)
 console.log(deletedProduct);
+ 
